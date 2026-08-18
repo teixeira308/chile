@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chile 2026 · Listão de Passeios</title>
+<style>
+  :root {
+    --bg: #0f1220;
+    --panel: #171b2e;
+    --panel2: #1d2340;
+    --border: #2a3155;
+    --text: #e8eaf6;
+    --muted: #9aa3c7;
+    --accent: #6c8cff;
+    --green: #37d39a;
+    --yellow: #ffc86b;
+    --pink: #ff7eb3;
+    --cyan: #53d6ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    padding: 32px 20px 80px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  header h1 { font-size: 28px; letter-spacing: -.5px; }
+  header .sub { color: var(--muted); margin-top: 6px; font-size: 15px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip {
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 4px 12px; border-radius: 999px; font-size: 13px; color: var(--muted);
+  }
+  .chip b { color: var(--text); font-weight: 600; }
+
+  .summary {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin: 24px 0 30px;
+  }
+  .stat {
+    background: linear-gradient(180deg, var(--panel), var(--panel2));
+    border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px;
+  }
+  .stat .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .stat .value { font-size: 22px; font-weight: 700; margin-top: 6px; }
+  .stat .note { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; font-size: 13px; color: var(--muted); }
+  .legend span::before {
+    content: ""; display: inline-block; width: 10px; height: 10px;
+    border-radius: 3px; margin-right: 6px;
+  }
+  .lg-gratis::before { background: var(--green); }
+  .lg-pago::before { background: var(--yellow); }
+  .lg-pacote::before { background: var(--pink); }
+  .lg-transporte::before { background: var(--cyan); }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 20px; }
+  input[type="search"] {
+    flex: 1; min-width: 220px; background: var(--panel); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 14px; border-radius: 10px; font-size: 14px; outline: none;
+  }
+  input[type="search"]:focus { border-color: var(--accent); }
+  .toggles { display: flex; gap: 8px; flex-wrap: wrap; }
+  .toggles button {
+    background: var(--panel); border: 1px solid var(--border); color: var(--muted);
+    padding: 8px 14px; border-radius: 10px; font-size: 13px; cursor: pointer;
+  }
+  .toggles button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 14px; overflow: hidden; }
+  thead th {
+    background: var(--panel2); text-align: left; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--muted); padding: 12px 14px; position: sticky; top: 0;
+  }
+  tbody td { padding: 11px 14px; border-top: 1px solid var(--border); font-size: 14px; vertical-align: top; }
+  tr.secao td {
+    background: var(--panel2); color: var(--text); font-weight: 700; font-size: 13px;
+    letter-spacing: .5px; border-top: 2px solid var(--border);
+  }
+  tr.secao td span.tag { font-weight: 400; color: var(--muted); margin-left: 8px; font-size: 12px; }
+  .cat { font-size: 12px; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .cat.gratis { background: rgba(55,211,154,.15); color: var(--green); border: 1px solid rgba(55,211,154,.4); }
+  .cat.pago { background: rgba(255,200,107,.15); color: var(--yellow); border: 1px solid rgba(255,200,107,.4); }
+  .cat.pacote { background: rgba(255,126,179,.15); color: var(--pink); border: 1px solid rgba(255,126,179,.4); }
+  .cat.transporte { background: rgba(83,214,255,.15); color: var(--cyan); border: 1px solid rgba(83,214,255,.4); }
+  .preco { white-space: nowrap; font-weight: 600; color: var(--yellow); }
+  .preco.clp { color: var(--text); font-weight: 400; }
+  .obs { color: var(--muted); font-size: 13px; }
+  .free { color: var(--green); font-weight: 600; }
+  .loc { color: var(--muted); font-size: 13px; }
+  .hide { display: none; }
+
+  footer { margin-top: 30px; font-size: 12px; color: var(--muted); line-height: 1.8; }
+  footer b { color: var(--text); }
+  .cambio { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-bottom: 24px; font-size: 13px; color: var(--muted); }
+  .cambio b { color: var(--yellow); }
+
+  input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+  tr.selecionada td { background: rgba(108,140,255,.08); }
+  tr.selecionada td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+
+  .selbar {
+    position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 16px; z-index: 50;
+    background: var(--panel2); border: 1px solid var(--accent); border-radius: 999px;
+    padding: 10px 18px; font-size: 14px; box-shadow: 0 8px 30px rgba(0,0,0,.5);
+    white-space: nowrap; max-width: 96vw; flex-wrap: wrap; justify-content: center;
+  }
+  .selbar .selbar-total { color: var(--yellow); }
+  .selbar .selbar-actions { display: flex; gap: 8px; }
+  .selbar button, .lista-actions button {
+    background: var(--accent); color: #fff; border: none; padding: 8px 16px;
+    border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .selbar button.ghost, .lista-actions button.ghost {
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
+  }
+  .selbar button:hover, .lista-actions button:hover { filter: brightness(1.15); }
+
+  .minha-lista {
+    margin-top: 40px; background: linear-gradient(180deg, var(--panel), var(--panel2));
+    border: 1px solid var(--accent); border-radius: 16px; padding: 22px 24px;
+  }
+  .minha-lista h2 { font-size: 20px; }
+  .minha-lista .sub { color: var(--muted); font-size: 13px; margin: 4px 0 16px; }
+  #listaItens { display: flex; flex-direction: column; gap: 10px; }
+  .item-lista {
+    display: grid; grid-template-columns: 1fr auto auto auto;
+    gap: 14px; align-items: center;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 10px 14px; font-size: 14px;
+  }
+  .item-lista .il-nome { font-weight: 600; }
+  .item-lista .il-extra { color: var(--muted); font-size: 12px; }
+  .item-lista .il-preco { color: var(--yellow); font-weight: 600; white-space: nowrap; }
+  .item-lista .il-del {
+    background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 2px 6px;
+  }
+  .item-lista .il-del:hover { color: var(--pink); }
+  .lista-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 14px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border);
+  }
+  .lista-total { font-size: 16px; }
+  .lista-total b { color: var(--yellow); font-size: 20px; }
+  .lista-actions { display: flex; gap: 10px; }
+  @media (max-width: 720px) {
+    .item-lista { grid-template-columns: 1fr auto; }
+    .item-lista .il-extra { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🧭 Chile · Setembro 2026 — Listão de Passeios</h1>
+    <p class="sub">Todos os passeios, preços, localizações e observações para ter uma noção geral do roteiro.</p>
+    <div class="chips">
+      <span class="chip">📅 5 dias · <b>16 a 20/09/2026</b></span>
+      <span class="chip">💰 Câmbio ref. <b>R$ 1 ≈ CLP 180</b></span>
+      <span class="chip">✈️ Voo GRU→SCL ~4h30</span>
+    </div>
+  </header>
+
+  <div class="cambio">💱 <b>Conversão rápida:</b> CLP 1.800 ≈ R$ 10 · CLP 9.000 ≈ R$ 50 · CLP 20.000 ≈ R$ 111 · CLP 55.000 ≈ R$ 305. Preços em <b>CLP</b> (peso chileno); aprox. em R$ no lado direito para referência.</div>
+
+  <div class="summary">
+    <div class="stat"><div class="label">🎟️ Passeios pagos (estimativa por pessoa)</div><div class="value">CLP ~85–105 mil</div><div class="note">≈ R$ 470–580</div></div>
+    <div class="stat"><div class="label">🎉 Passeios gratuitos</div><div class="value">+20 opções</div><div class="note">museus, cerros, bairros, fondas</div></div>
+    <div class="stat"><div class="label">🚌 Transporte interno (estimativa)</div><div class="value">CLP ~60–90 mil</div><div class="note">≈ R$ 335–500 (transfer, bus, metrô)</div></div>
+    <div class="stat"><div class="label">🏔️ Portillo (opcional)</div><div class="value">US$ 793–1.564</div><div class="note">Mini Week 3 noites por pessoa</div></div>
+  </div>
+
+  <div class="legend">
+    <span class="lg-gratis">Gratuito</span>
+    <span class="lg-pago">Pago (CLP)</span>
+    <span class="lg-pacote">Pacote / estadia</span>
+    <span class="lg-transporte">Transporte</span>
+  </div>
+
+  <div class="controls">
+    <input type="search" id="busca" placeholder="🔎 Buscar passeio, bairro, preço...">
+    <div class="toggles">
+      <button data-f="gratis" class="active">Gratuitos</button>
+      <button data-f="pago" class="active">Pagos</button>
+      <button data-f="pacote" class="active">Portillo</button>
+      <button data-f="transporte" class="active">Transporte</button>
+    </div>
+  </div>
+
+  <table id="tabela">
+    <thead>
+      <tr>
+        <th style="width:34px"><input type="checkbox" id="selTodos" title="Selecionar todos (visíveis)"></th>
+        <th>Passeio</th>
+        <th>Tipo</th>
+        <th>Preço</th>
+        <th>Aprox. R$</th>
+        <th>Localização</th>
+        <th>Observação</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- ======================= SANTIAGO ======================= -->
+      <tr class="secao"><td colspan="7">🏙️ Santiago — vistas, cerros e cultura</td></tr>
+
+      <tr class="p-gratis">
+        <td><b>Cerro Santa Lucía</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Centro, próximo à Alameda</td>
+        <td class="obs">Morro histórico; pôr do sol imperdível. ~09h–19h.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Cerro San Cristóbal</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td class="preco clp">Funicular CLP 8.500</td>
+        <td class="loc">≈ R$ 47 (funicular)</td>
+        <td class="loc">Parque Metropolitano</td>
+        <td class="obs">Melhor vista da cidade + cordilheira nevada. Entrada grátis; suba a pé/bike pela Baquedano.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Sky Costanera</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP ~14.900</td>
+        <td class="loc">≈ R$ 83</td>
+        <td class="loc">Gran Torre Costanera, Providencia</td>
+        <td class="obs">Deck no 62º andar (prédio mais alto da AL). Melhor no pôr do sol p/ ver os Andes.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Plaza de Armas + Catedral</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Praça principal com carruagens e Palácio Arzobispal.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Palacio de La Moneda</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Visita guiada gratuita nos fins de semana (agende); troca de guarda ~10h em dias úteis.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Museo Nacional de Bellas Artes</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Parque Forestal</td>
+        <td class="obs">Museu de arte no centro, entrada livre.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Museo de la Memoria y DD.HH.</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Quinta Normal</td>
+        <td class="obs">Memória do regime militar; gratuito (confirme horários).</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>MAC Quinta Normal</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Quinta Normal</td>
+        <td class="obs">Museu de arte contemporânea, entrada gratuita.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Barrio Lastarria + Parque Forestal</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Lastarria</td>
+        <td class="obs">Ruas de arte + feirinha de rua nos fins de semana.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Barrio Bellavista + Patio Bellavista</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Bellavista</td>
+        <td class="obs">Arte urbana, graffiti e vida noturna.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Parque Bicentenario</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Vitacura</td>
+        <td class="obs">Lagos, cisnes e vista dos Andes.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Pueblito de Los Domínicos</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Los Domínicos</td>
+        <td class="obs">Mercado de artesanato a céu aberto.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Mercado Central</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis (visitar)</span></td>
+        <td class="loc">Almoço à parte</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Coração gastronômico; paila marina no Donde Augusto (almoço ~CLP 12.000+).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>La Chascona (casa de Neruda)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP ~9.000</td>
+        <td class="loc">≈ R$ 50</td>
+        <td class="loc">Bellavista</td>
+        <td class="obs">Casa do poeta em Santiago. Ingresso combinado das 3 casas dá desconto.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Wonderland Café (Alice)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Café/brunch ~CLP 8–15 mil</td>
+        <td class="loc">≈ R$ 45–85</td>
+        <td class="loc">Rosal 361, Lastarria</td>
+        <td class="obs">Melhor cafeteria de Santiago (TripAdvisor 2021–25); reserva pelo CoverManager.</td>
+      </tr>
+
+      <!-- ======================= SANTIAGO EXTRA ======================= -->
+      <tr class="secao"><td colspan="7">🏙️ Santiago — mais bairros, cultura e parques</td></tr>
+
+      <tr class="p-gratis">
+        <td><b>Barrio Italia</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Providencia</td>
+        <td class="obs">Ruas com antiquários, brechós, cafés e design. Perfeito para caminhar à tarde.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Barrio Yungay + Barrio Concha y Toro</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Oeste do centro</td>
+        <td class="obs">O bairro mais antigo e charmoso, com casarões, praças e feirinhas.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Parque Quinta Normal + Museo de Historia Natural</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Quinta Normal</td>
+        <td class="obs">Parque arborizado com museu de história natural gratuito; ótimo para piquenique.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Centro Cultural La Moneda + Biblioteca Nacional</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Exposições gratuitas sob o Palacio de La Moneda e biblioteca histórica.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Cementerio General</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Recoleta</td>
+        <td class="obs">Museu a céu aberto com mausoléus monumentais e história chilena; tours guiados.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Mercado La Vega</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis (visitar)</span></td>
+        <td class="loc">Compras à parte</td>
+        <td class="loc">Recoleta, perto do mercado</td>
+        <td class="obs">O maior mercado de produtos frescos; cor e comida de rua autêntica.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Torre Entel (mirador)</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td class="preco clp">Mirador pago</td>
+        <td class="loc">≈ R$ 40</td>
+        <td class="loc">Av. Providencia</td>
+        <td class="obs">Mirante no alto da torre de comunicações com vista 360° (confirme horários).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Mirador del Cerro (tour de bike)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">~CLP 20–30 mil</td>
+        <td class="loc">≈ R$ 110–165</td>
+        <td class="loc">Cerro San Cristóbal</td>
+        <td class="obs">Aluguel de bike para subir o cerro pela trilha (assimétrica, tranquila).</td>
+      </tr>
+
+      <!-- ======================= RESTAURANTES SANTIAGO ======================= -->
+      <tr class="secao"><td colspan="7">🍽️ Restaurantes em Santiago</td></tr>
+
+      <tr class="p-pago">
+        <td><b>Peumayén</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Prato ~CLP 15–25 mil</td>
+        <td class="loc">≈ R$ 83–140</td>
+        <td class="loc">Bellavista</td>
+        <td class="obs">Gastronomia nativa com ingredientes mapuches; experiência cultural (reserve).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Donde Augusto</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Almoço ~CLP 15–20 mil</td>
+        <td class="loc">≈ R$ 83–110</td>
+        <td class="loc">Mercado Central</td>
+        <td class="obs">Frutos do mar clássico; a famosa paila marina.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Galindo</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Empanadas ~CLP 3–5 mil</td>
+        <td class="loc">≈ R$ 17–28</td>
+        <td class="loc">Bellavista</td>
+        <td class="obs">Empanadas e petiscos no coração de Bellavista; boteco querido.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Bocanáriz</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Jantar ~CLP 20–35 mil</td>
+        <td class="loc">≈ R$ 110–195</td>
+        <td class="loc">Lastarria</td>
+        <td class="obs">Carta com 300 rótulos de vinho chileno + pratos de taverna.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Fuente Alemana</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Sanduíche ~CLP 8–12 mil</td>
+        <td class="loc">≈ R$ 45–67</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Sanduíches históricos e chorrillana; desde 1933.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>La Piojera</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Terremoto ~CLP 5–8 mil</td>
+        <td class="loc">≈ R$ 28–45</td>
+        <td class="loc">Centro, perto da Alameda</td>
+        <td class="obs">Onde nasceu o drink <b>terremoto</b>; parada obrigatória de boteco.</td>
+      </tr>
+
+      <!-- ======================= BARES SANTIAGO ======================= -->
+      <tr class="secao"><td colspan="7">🍸 Bares &amp; vida noturna em Santiago</td></tr>
+
+      <tr class="p-pago">
+        <td><b>Bar Liguria</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Drink ~CLP 8–12 mil</td>
+        <td class="loc">≈ R$ 45–67</td>
+        <td class="loc">Providencia</td>
+        <td class="obs">Ícone dos bares de Santiago; decoração eclética e coquetéis clássicos.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Bar Nacional</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Drink ~CLP 6–10 mil</td>
+        <td class="loc">≈ R$ 33–55</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Boteco histórico dos jornalistas e políticos; pisco sour clássico.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Pacífico (cerveja artesanal)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Cerveja ~CLP 4–7 mil</td>
+        <td class="loc">≈ R$ 22–39</td>
+        <td class="loc">Barrio Italia</td>
+        <td class="obs">Barra de chope artesanal com variedade de rótulos chilenos.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Kunstmann</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Cerveja ~CLP 5–8 mil</td>
+        <td class="loc">≈ R$ 28–45</td>
+        <td class="loc">Bellavista</td>
+        <td class="obs">Cervejaria alemã com chopes e petiscos; ambiente descontraído.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Patio Bellavista</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Gastos variados</td>
+        <td class="loc">Variado</td>
+        <td class="loc">Bellavista</td>
+        <td class="obs">Polo gastronômico e boêmio: vários bares e restaurantes em um pátio.</td>
+      </tr>
+
+      <!-- ======================= VALPARAÍSO / VIÑA ======================= -->
+      <tr class="secao"><td colspan="7">🌊 Valparaíso &amp; Viña del Mar</td></tr>
+
+      <tr class="p-transporte">
+        <td><b>Bus Santiago ↔ Valparaíso</b></td>
+        <td><span class="cat transporte">Transporte</span></td>
+        <td class="preco">CLP ~7.000</td>
+        <td class="loc">≈ R$ 39</td>
+        <td class="loc">Pullman, Terminal Alameda</td>
+        <td class="obs">~1h40. Ida e volta ≈ CLP 14.000. Compre antes em dia de festa.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Cerro Alegre + Cerro Concepción</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Valparaíso</td>
+        <td class="obs">Murais, casas coloridas, Paseo Gervasoni e Atkinson. Cartão-postal.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Paseo 21 de Mayo</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Valparaíso</td>
+        <td class="obs">Mirante sobre o porto; melhor pôr do sol.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Ascensores históricos</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP 300–500 cada</td>
+        <td class="loc">≈ R$ 2–3</td>
+        <td class="loc">Valparaíso</td>
+        <td class="obs">Bondinhos de 1800 preservados. Faça o El Peral e o Concepción.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>La Sebastiana (casa de Neruda)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP ~7.000</td>
+        <td class="loc">≈ R$ 39</td>
+        <td class="loc">Valparaíso</td>
+        <td class="obs">Casa-museu com a maior vista da cidade.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Plaza Sotomayor</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Valparaíso</td>
+        <td class="obs">Praça central à beira do porto.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Reloj de Flores</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Viña del Mar</td>
+        <td class="obs">Relógio florido na beira-mar, a 15 min de Valpo.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Caleta Portales</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis (visitar)</span></td>
+        <td class="loc">Almoço à parte</td>
+        <td class="loc">Viña del Mar</td>
+        <td class="obs">Peixarias pé na areia; melhor almoço de peixe (~CLP 12–15 mil).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Isla Negra (casa de Neruda)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP ~8.000–9.000</td>
+        <td class="loc">≈ R$ 44–50</td>
+        <td class="loc">Costa, ~2h de Santiago</td>
+        <td class="obs">Casa preferida do poeta, pé no oceano. Vale o dia se quiser praia + poesia.</td>
+      </tr>
+
+      <!-- ======================= RESTAURANTES VALPO ======================= -->
+      <tr class="secao"><td colspan="7">🍽️ Restaurantes em Valparaíso &amp; Viña</td></tr>
+
+      <tr class="p-pago">
+        <td><b>Café Turri</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Jantar ~CLP 20–30 mil</td>
+        <td class="loc">≈ R$ 110–165</td>
+        <td class="loc">Valparaíso, sobre o porto</td>
+        <td class="obs">Frutos do mar com vista frontal para o porto; reserve a mesa da janela.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Pizzería Cinco Torres</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Pizza ~CLP 10–15 mil</td>
+        <td class="loc">≈ R$ 55–83</td>
+        <td class="loc">Valparaíso</td>
+        <td class="obs">Pizza napolitana no bairro boêmio; cardápio com linguagem chileninha.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>La Gringa</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Prato ~CLP 12–18 mil</td>
+        <td class="loc">≈ R$ 67–100</td>
+        <td class="loc">Valparaíso</td>
+        <td class="obs">Clássico de frutos do mar e ceviches.</td>
+      </tr>
+
+      <!-- ======================= VINHEDOS ======================= -->
+      <tr class="secao"><td colspan="7">🍷 Vinhedos do Vale do Maipo (bate-volta de Santiago)</td></tr>
+
+      <tr class="p-pago">
+        <td><b>Viña Concha y Toro</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP 50.000+</td>
+        <td class="loc">≈ R$ 278</td>
+        <td class="loc">Pirque, ~45 min de Santiago</td>
+        <td class="obs">A vinícola mais famosa do Chile — tour inclui a adega subterrânea <b>Casillero del Diablo</b> e degustação de 4 vinhos. Com traslado ~CLP 76.000.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Viña Santa Rita</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Tour ~CLP 30–50 mil</td>
+        <td class="loc">≈ R$ 165–278</td>
+        <td class="loc">Alto Jahuel (Buin), ~45 min</td>
+        <td class="obs">Vinícola histórica dos 120 patriotas; tours com degustação e restaurante.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Viña Cousiño Macul</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP 25.000–45.000</td>
+        <td class="loc">≈ R$ 139–250</td>
+        <td class="loc">Av. Quilín, dentro de Santiago</td>
+        <td class="obs">Vinícola urbana histórica (1856) com tours que vão de tradicional a piquenique.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Viña Undurraga</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP 29.500–42.000</td>
+        <td class="loc">≈ R$ 164–233</td>
+        <td class="loc">Isla del Maipo</td>
+        <td class="obs">Adega centenária (1885) no coração do Maipo; tours Sibaris e Founders.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Rota dos vinhos (tour combinado)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 200–300</td>
+        <td class="loc">≈ R$ 1.100–1.650</td>
+        <td class="loc">Vale do Maipo</td>
+        <td class="obs">Day tour privado visitando 2–3 vinícolas (ex.: Concha y Toro + Santa Rita + Undurraga) com transporte, guia e almoço.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Vinhedos do Vale de Casablanca</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Tour ~CLP 40–60 mil</td>
+        <td class="loc">≈ R$ 220–333</td>
+        <td class="loc">Casablanca, ~1h15 (a caminho de Valpo)</td>
+        <td class="obs">Vinhedos de brancos (chardonnay/sauvignon blanc); casas como Casas del Bosque e Emiliana. Perfeito na volta de Valparaíso.</td>
+      </tr>
+
+      <!-- ======================= CAJÓN DEL MAIPO ======================= -->
+      <tr class="secao"><td colspan="7">🏔️ Cajón del Maipo + Termas (dia inteiro nos Andes)</td></tr>
+
+      <tr class="p-pago">
+        <td><b>Tour Cajón del Maipo + Embalse El Yeso</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP 50–60 mil</td>
+        <td class="loc">≈ R$ 278–333</td>
+        <td class="loc">Saída de Santiago, ~1h30–2h</td>
+        <td class="obs">Vale andino + represa azul-turquesa (2.500 m). Tour inclui transporte/guia — forma mais fácil sem carro.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Termas de Colina</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP 15.000–20.000</td>
+        <td class="loc">≈ R$ 83–111</td>
+        <td class="loc">Cajón del Maipo</td>
+        <td class="obs">Piscinas de água termal ao ar livre.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Baños Morales</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP 8.000–12.000</td>
+        <td class="loc">≈ R$ 44–67</td>
+        <td class="loc">Cajón del Maipo</td>
+        <td class="obs">Poços naturais de água quente.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Termas del Plomo</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">Rústica</td>
+        <td class="loc">—</td>
+        <td class="loc">Cajón del Maipo</td>
+        <td class="obs">Mais rústica e barata; banho natural.</td>
+      </tr>
+
+      <!-- ======================= FERIADOS PATRIOS ======================= -->
+      <tr class="secao"><td colspan="7">🇨🇱 Feriados Patrios (18–19/09)</td></tr>
+
+      <tr class="p-gratis">
+        <td><b>Fondas</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis (entrar)</span></td>
+        <td class="loc">Comida à parte</td>
+        <td class="loc">Vários parques de Santiago</td>
+        <td class="obs">Festas de rua: empanadas, anticuchos, terremoto e cueca. É a maior festa do ano.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Gran Parada Militar</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Parque O'Higgins</td>
+        <td class="obs">Desfile em 19/09; chegue cedo para pegar lugar.</td>
+      </tr>
+
+      <!-- ======================= CORDILHEIRA / NEVE ======================= -->
+      <tr class="secao"><td colspan="7">🏔️ Cordilheira &amp; neve — centros de esqui (bate-volta de Santiago)</td></tr>
+
+      <tr class="p-pago">
+        <td><b>Valle Nevado — day pass</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP ~93.000</td>
+        <td class="loc">≈ R$ 517</td>
+        <td class="loc">~46 km de Santiago (~1h)</td>
+        <td class="obs">O maior centro de esqui dos Andes próximos a Santiago; ski-pass adulto (tarjeta Valle Plus +CLP 6.000). Aluguel de equipamento ~CLP 29.000/dia.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>El Colorado — day pass</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP 68.000–75.000</td>
+        <td class="loc">≈ R$ 378–417</td>
+        <td class="loc">~60 km de Santiago (~1h30)</td>
+        <td class="obs">Centro de esqui ao lado de Farellones; ticket mais barato em temporada baixa e às sextas (30% off).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>La Parva — day pass</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP ~83.000</td>
+        <td class="loc">≈ R$ 461</td>
+        <td class="loc">~50 km de Santiago (~1h20)</td>
+        <td class="obs">Centro de esqui mais alto e exclusivo; ski-pass estável ao longo da temporada.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Farellones — Centro (entry)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">CLP 51.000–74.000</td>
+        <td class="loc">≈ R$ 283–411</td>
+        <td class="loc">~60 km de Santiago (~1h20)</td>
+        <td class="obs">Vila de montanha com atividades na neve para quem não esquia; temporada baixa (setembro) é mais barata.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Cabalgata / passeio a cavalo na neve</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">~CLP 30–50 mil</td>
+        <td class="loc">≈ R$ 165–278</td>
+        <td class="loc">Cordilheira (Farellones/Cajón)</td>
+        <td class="obs">Passeios de cavalo guiados na neve — alternativa para quem não esquia. Verifique com as operadoras locais.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Mirador da cordilheira (tour panorâmico)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco clp">~CLP 25–40 mil</td>
+        <td class="loc">≈ R$ 140–220</td>
+        <td class="loc">La Parva / El Colorado</td>
+        <td class="obs">Excursão para ver a cordilheira e os vulcões (Tupungato, El Plomo) sem esquiar; ideal para fotos.</td>
+      </tr>
+
+      <!-- ======================= PORTILLO ======================= -->
+      <tr class="secao"><td colspan="7">⛷️ Hotel Portillo (opcional — neve)</td></tr>
+
+      <tr class="p-pacote">
+        <td><b>Portillo — Mini Week 3 noites</b></td>
+        <td><span class="cat pacote">Pacote</span></td>
+        <td class="preco">US$ 793–1.564</td>
+        <td class="loc">≈ R$ 4.400–8.600</td>
+        <td class="loc">164 km de Santiago (~2h), 2.880 m</td>
+        <td class="obs">Por pessoa, all-inclusive (4 refeições + ski pass). Setembro = temporada baixa, o mais barato.</td>
+      </tr>
+
+      <tr class="p-pacote">
+        <td><b>Portillo — Day pass (bate-volta)</b></td>
+        <td><span class="cat pacote">Pacote</span></td>
+        <td class="preco clp">Diário (day pass)</td>
+        <td class="loc">—</td>
+        <td class="loc">Portillo</td>
+        <td class="obs">Opção dia inteiro de neve saindo cedo de Santiago.</td>
+      </tr>
+
+      <tr class="p-transporte">
+        <td><b>Transfer Portillo (shuttle)</b></td>
+        <td><span class="cat transporte">Transporte</span></td>
+        <td class="preco">US$ 130/trecho</td>
+        <td class="loc">≈ R$ 715</td>
+        <td class="loc">Aeroporto SCL ↔ Portillo</td>
+        <td class="obs">Compartilhado; ida 9h/15h (qua/sáb), volta 14h. Privado US$ 302+.</td>
+      </tr>
+
+      <tr class="p-pacote">
+        <td><b>Aluguel de esquis/botas</b></td>
+        <td><span class="cat pacote">Pacote</span></td>
+        <td class="preco">US$ 30–40/dia</td>
+        <td class="loc">≈ R$ 165–220</td>
+        <td class="loc">Portillo</td>
+        <td class="obs">Não precisa levar equipamento — Portillo aluga.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Ciudad Empresarial (Sanhattan)</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Sanhattan, Santiago</td>
+        <td class="obs">Distrito financeiro com arranha-céus e arquitetura moderna — "Manhattan" chilena.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Plaza de la Constitución + Palácios</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Centro, La Moneda</td>
+        <td class="obs">Praça com palácios governamentais; vista da fachada principal da La Moneda.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Baica Parque Forestal (feira de bairro)</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">R$ 0</td>
+        <td class="loc">Parque Forestal</td>
+        <td class="obs">Feirinha de artesanato aos fins de semana perto do Museu Bellas Artes.</td>
+      </tr>
+
+      <!-- ======================= FREE TOURS ======================= -->
+      <tr class="secao"><td colspan="7">🎟️ Free tours (gratuitos, gorjeta ao guia)</td></tr>
+
+      <tr class="p-gratis">
+        <td><b>Free tour por Santiago</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">Gorjeta ~US$ 10–20</td>
+        <td class="loc">Centro histórico</td>
+        <td class="obs">Melhor forma de conhecer a história da capital — ~2h, espanhol.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Free tour + Troca de Guarda</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">Gorjeta ~US$ 10–20</td>
+        <td class="loc">Centro + La Moneda</td>
+        <td class="obs">Free tour + troca de guarda presidencial (~2h).</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Free tour museus e palácios</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">Gorjeta ~US$ 10–20</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Free tour pelos principais museus e palácios da capital (~2h30).</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Free tour pelos mercados</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">Gorjeta ~US$ 10–20</td>
+        <td class="loc">Mercados de Santiago</td>
+        <td class="obs">Visita aos mercados mais importantes da capital (~2h).</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Free tour bairro Yungay</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">Gorjeta ~US$ 10–20</td>
+        <td class="loc">Yungay</td>
+        <td class="obs">Bairro multicultural com arte urbana (~2h).</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Free tour bairro Providencia</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">Gorjeta ~US$ 10–20</td>
+        <td class="loc">Providencia</td>
+        <td class="obs">Bairro boêmio com cultura e tesouros escondidos (~3h).</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Free tour pelas igrejas</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td><span class="free">Grátis</span></td>
+        <td class="loc">Gorjeta ~US$ 10–20</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Templos mais antigos do Chile, lendas e mistérios da Catedral (~2h).</td>
+      </tr>
+
+      <!-- ======================= VISITAS GUIADAS ======================= -->
+      <tr class="secao"><td colspan="7">🗺️ Visitas guiadas em Santiago</td></tr>
+
+      <tr class="p-pago">
+        <td><b>Visita guiada por Santiago</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 16,41</td>
+        <td class="loc">≈ R$ 90</td>
+        <td class="loc">Centro histórico</td>
+        <td class="obs">Tour a pé pelo centro, da época colonial aos dias atuais (~2h30).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour panorâmico por Santiago</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 45,24</td>
+        <td class="loc">≈ R$ 250</td>
+        <td class="loc">La Moneda → Costanera</td>
+        <td class="obs">Percorre a cidade de oeste a leste, com parada no Costanera (~4–5h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour por Santiago + Teleférico San Cristóbal</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 109,45</td>
+        <td class="loc">≈ R$ 600</td>
+        <td class="loc">Centro + Cerro San Cristóbal</td>
+        <td class="obs">Tour a pé + subida no teleférico do cerro (~4–5h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour por Lastarria + Cerro Santa Lucía</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 13,50</td>
+        <td class="loc">≈ R$ 75</td>
+        <td class="loc">Lastarria</td>
+        <td class="obs">Monumentos do bairro + subida ao cerro (~2h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour por Patronato + Bellavista</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 32,40</td>
+        <td class="loc">≈ R$ 180</td>
+        <td class="loc">Patronato/Bellavista</td>
+        <td class="obs">Lado boêmio e internacional de Santiago (~3h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour pelas igrejas de Santiago</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 18</td>
+        <td class="loc">≈ R$ 100</td>
+        <td class="loc">Centro</td>
+        <td class="obs">História e arquitetura dos templos da cidade (~3h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour ditadura de Pinochet</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 98,51</td>
+        <td class="loc">≈ R$ 540</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Passeio histórico pela ditadura e pelos direitos humanos (~4h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour Museu da Memória e DD.HH.</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 21</td>
+        <td class="loc">≈ R$ 115</td>
+        <td class="loc">Quinta Normal</td>
+        <td class="obs">Com guia, aprofundando o tema da ditadura (~2h; museu é grátis).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour Museu Pré-Colombiana + Histórico</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 41,40</td>
+        <td class="loc">≈ R$ 230</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Viagem no tempo por duas coleções imperdíveis (~3h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour Museu Histórico e Militar</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 18</td>
+        <td class="loc">≈ R$ 100</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Uniforme, armas e história do Chile (~3h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour Estádio Monumental (Colo-Colo)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 74,43</td>
+        <td class="loc">≈ R$ 410</td>
+        <td class="loc">Macul</td>
+        <td class="obs">Casa do Colo-Colo, para fãs de futebol (~3h30).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Ônibus turístico (hop-on hop-off)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 58,01</td>
+        <td class="loc">≈ R$ 320</td>
+        <td class="loc">Santiago</td>
+        <td class="obs">Explore os pontos turísticos subindo/descendo nas paradas (1–3 dias).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour de bicicleta por Santiago</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 42+</td>
+        <td class="loc">≈ R$ 230</td>
+        <td class="loc">Santiago</td>
+        <td class="obs">Diferentes rotas pela capital (~3–8h), espanhol/inglês.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour de segway por Santiago</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 80+</td>
+        <td class="loc">≈ R$ 440</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Jeito divertido de visitar os pontos turísticos (~2h30).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour de patinete elétrico (San Cristóbal)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 75+</td>
+        <td class="loc">≈ R$ 410</td>
+        <td class="loc">Cerro San Cristóbal</td>
+        <td class="obs">Um dos maiores parques urbanos da AL sobre patinete (~3h30–5h).</td>
+      </tr>
+
+      <!-- ======================= EXCURSÕES BATE-VOLTA ======================= -->
+      <tr class="secao"><td colspan="7">🚌 Excursões bate-volta com transporte (saindo de Santiago)</td></tr>
+
+      <tr class="p-pago">
+        <td><b>Excursão a Valparaíso e Viña del Mar</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 42,11</td>
+        <td class="loc">≈ R$ 230</td>
+        <td class="loc">Valparaíso/Viña</td>
+        <td class="obs">Tour completo das duas cidades costeiras com transporte (~10–11h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Excursão Isla Negra + Algarrobo + Undurraga</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 92,65</td>
+        <td class="loc">≈ R$ 510</td>
+        <td class="loc">Costa + vinícola</td>
+        <td class="obs">Poesia e sabor num só dia: Neruda, Algarrobo e a vinícola Undurraga (~9h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Excursão Isla Negra + Pomaire</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 164,18</td>
+        <td class="loc">≈ R$ 900</td>
+        <td class="loc">Costa + Pomaire</td>
+        <td class="obs">Casa de Neruda no Pacífico + feira de cerâmica de Pomaire (~8h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Excursão Isla Negra + San Alfonso del Mar</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 164,18</td>
+        <td class="loc">≈ R$ 900</td>
+        <td class="loc">Costa (Algarrobo)</td>
+        <td class="obs">Casa de Neruda + maior piscina do mundo (~9h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Excursão ao Parque Safári de Rancagua</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 89,74</td>
+        <td class="loc">≈ R$ 495</td>
+        <td class="loc">Rancagua (~1h20)</td>
+        <td class="obs">Animais de perto em safári (~6h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Excursão ao Parque Nacional Siete Tazas</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 102,34</td>
+        <td class="loc">≈ R$ 560</td>
+        <td class="loc">Maule (~3h)</td>
+        <td class="obs">Cascatas e caminhadas (~12–14h) — dia bem longo.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Excursão ao Parque Aconcagua (Argentina)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 317,42</td>
+        <td class="loc">≈ R$ 1.750</td>
+        <td class="loc">Fronteira Argentina</td>
+        <td class="obs">Montanha mais alta da América + Laguna del Inca (~13h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Excursão a San José de Maipo</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 139,01</td>
+        <td class="loc">≈ R$ 765</td>
+        <td class="loc">Cajón del Maipo</td>
+        <td class="obs">Povoado, chocolate artesanal e hotel/spa (~10h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Excursão a Pomaire + Parque Tricao</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 136,82</td>
+        <td class="loc">≈ R$ 750</td>
+        <td class="loc">Maipo/Costa</td>
+        <td class="obs">Aves exóticas + cerâmica de Pomaire (~9h30).</td>
+      </tr>
+
+      <!-- ======================= AVENTURA & NATUREZA ======================= -->
+      <tr class="secao"><td colspan="7">🏄 Aventura &amp; natureza (Cajón del Maipo e arredores)</td></tr>
+
+      <tr class="p-pago">
+        <td><b>Trilha pelo Cajón del Maipo (mirante El Yeso)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 152</td>
+        <td class="loc">≈ R$ 840</td>
+        <td class="loc">Cajón del Maipo</td>
+        <td class="obs">Trilha até o mirante do Embalse El Yeso e glaciar Mesón Alto (~12h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Escalada em Cajón del Maipo</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 241,90</td>
+        <td class="loc">≈ R$ 1.330</td>
+        <td class="loc">Cajón del Maipo</td>
+        <td class="obs">Escalada no cânion andino, guiada (~8h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Rafting no rio Maipo</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 486 (grupo)</td>
+        <td class="loc">≈ R$ 2.670</td>
+        <td class="loc">Rio Maipo</td>
+        <td class="obs">Adrenalina nas corredeiras com vista para os Andes (~8h30).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Excursão a cavalo pelo Cajón de Maipo</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 266</td>
+        <td class="loc">≈ R$ 1.460</td>
+        <td class="loc">Cajón del Maipo</td>
+        <td class="obs">Cavalgada até mirantes e lagoas (~12h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Trilha Cascada de las Ánimas (privada)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 471 (grupo)</td>
+        <td class="loc">≈ R$ 2.590</td>
+        <td class="loc">Cajón del Maipo</td>
+        <td class="obs">Floresta andina e pontes suspensas (~10h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Passeio com raquetes de neve (Cajón)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 234,23</td>
+        <td class="loc">≈ R$ 1.290</td>
+        <td class="loc">Cajón del Maipo</td>
+        <td class="obs">Trilha na neve com raquetes (snowshoes) — ~12h.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Excursão de moto de neve (Cajón)</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 286,20</td>
+        <td class="loc">≈ R$ 1.570</td>
+        <td class="loc">Vale La Engorda/Vulcão San José</td>
+        <td class="obs">Moto de neve pelas paisagens do Cajón (~11h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Passeio a cavalo cerro La Dehesa + vinho</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 129,59</td>
+        <td class="loc">≈ R$ 715</td>
+        <td class="loc">Cerro La Dehesa</td>
+        <td class="obs">Natureza perto de Santiago + degustação de vinho (~2h30).</td>
+      </tr>
+
+      <!-- ======================= MAIS VINHEDOS & EXPERIÊNCIAS ======================= -->
+      <tr class="secao"><td colspan="7">🍷 Mais vinhedos &amp; experiências de enoturismo</td></tr>
+
+      <tr class="p-pago">
+        <td><b>Viña Casas del Bosque</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 108,36</td>
+        <td class="loc">≈ R$ 595</td>
+        <td class="loc">Casablanca</td>
+        <td class="obs">Vinhedos premiados de Casablanca, melhor com transporte (~4h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Viña Haras de Pirque</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 85,37</td>
+        <td class="loc">≈ R$ 470</td>
+        <td class="loc">Pirque, Maipo</td>
+        <td class="obs">Vinhedos do Valle del Maipo + degustação (~4–6h30).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Viña Tres Palacios</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 35</td>
+        <td class="loc">≈ R$ 195</td>
+        <td class="loc">Maipo Costa</td>
+        <td class="obs">Tour pela produção de Vinho do Vale do Maipo Costa (~1h15–4h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Viña Monteluz</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 102,16</td>
+        <td class="loc">≈ R$ 560</td>
+        <td class="loc">Vale do Maipo</td>
+        <td class="obs">Tradição, música e vinho ilimitado (~8h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Viña Alyan ao entardecer</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 111,34</td>
+        <td class="loc">≈ R$ 610</td>
+        <td class="loc">Vale do Maipo</td>
+        <td class="obs">Vinícola + pôr do sol mágico (~7h30).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Cousiño Macul + Templo Bahá'í</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 87,56</td>
+        <td class="loc">≈ R$ 480</td>
+        <td class="loc">Santiago/Peñalolén</td>
+        <td class="obs">Vinho + templo Bahá'í com transporte (~4h30).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour do vinho Casillero del Diablo + jantar</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 166,93</td>
+        <td class="loc">≈ R$ 920</td>
+        <td class="loc">Concha y Toro, Pirque</td>
+        <td class="obs">Lenda do Casillero + jantar na vinícola (~5h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Vinhedos do Vale do Colchagua</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 273,64</td>
+        <td class="loc">≈ R$ 1.500</td>
+        <td class="loc">Colchagua (~2h)</td>
+        <td class="obs">Tradição vitivinícola com degustação (~11h30).</td>
+      </tr>
+
+      <!-- ======================= EXPERIÊNCIAS ======================= -->
+      <tr class="secao"><td colspan="7">🎉 Experiências únicas</td></tr>
+
+      <tr class="p-pago">
+        <td><b>Passeio de helicóptero por Santiago</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 473</td>
+        <td class="loc">≈ R$ 2.600</td>
+        <td class="loc">Centro</td>
+        <td class="obs">Sobrevoe o centro histórico (~2h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Jantar e espetáculo tradicional</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 103,98</td>
+        <td class="loc">≈ R$ 570</td>
+        <td class="loc">Santiago</td>
+        <td class="obs">Danças do Chile e da Ilha de Páscoa + jantar (~3h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Oficina de massas Amor y Pastas</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 69,22</td>
+        <td class="loc">≈ R$ 380</td>
+        <td class="loc">Santiago</td>
+        <td class="obs">Faça e saboreie sua própria massa (~4h).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Oficina de artesanato têxtil mapuche</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 82,09</td>
+        <td class="loc">≈ R$ 450</td>
+        <td class="loc">Santiago</td>
+        <td class="obs">Aprenda a tecer com técnica mapuche (~2h30–3h30).</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Tour de compras pelo Outlet Buenaventura</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">US$ 60,20</td>
+        <td class="loc">≈ R$ 330</td>
+        <td class="loc">Outlet Buenaventura</td>
+        <td class="obs">Compras de grifes — a "Miami" da América Latina (~5h).</td>
+      </tr>
+
+      <!-- ======================= CONTRATAÇÃO DE SERVIÇOS ======================= -->
+      <tr class="secao"><td colspan="7">↔️ Outros serviços (opcionais)</td></tr>
+
+      <tr class="p-transporte">
+        <td><b>Transfer privado aeroporto</b></td>
+        <td><span class="cat transporte">Transporte</span></td>
+        <td class="preco">US$ 42/carro</td>
+        <td class="loc">≈ R$ 230</td>
+        <td class="loc">SCL → centro</td>
+        <td class="obs">Serviço porta a porta no aeroporto, disponível na Civitatis.</td>
+      </tr>
+
+      <tr class="p-transporte">
+        <td><b>Chip eSIM</b></td>
+        <td><span class="cat transporte">Transporte</span></td>
+        <td class="preco">US$ 4,50</td>
+        <td class="loc">≈ R$ 25</td>
+        <td class="loc">Chile todo</td>
+        <td class="obs">Internet móvel em todo o Chile, opção prática para ficar conectado.</td>
+      </tr>
+
+      <tr class="p-gratis">
+        <td><b>Bateria portátil / carregadores</b></td>
+        <td><span class="cat gratis">Gratuito</span></td>
+        <td class="preco clp">Trazer de casa</td>
+        <td class="loc">—</td>
+        <td class="loc">Sua mala</td>
+        <td class="obs">Power bank é essencial: o frio descarrega celular mais rápido.</td>
+      </tr>
+
+      <tr class="p-pago">
+        <td><b>Seguro viagem</b></td>
+        <td><span class="cat pago">Pago</span></td>
+        <td class="preco">~US$ 30–60</td>
+        <td class="loc">≈ R$ 165–330</td>
+        <td class="loc">Chile todo</td>
+        <td class="obs">Assistência médica + imprevistos; compare antes de fechar.</td>
+      </tr>
+
+      <!-- ======================= TRANSPORTE ======================= -->
+      <tr class="secao"><td colspan="7">🚌 Transporte interno</td></tr>
+
+      <tr class="p-transporte">
+        <td><b>Transfer aeroporto → centro (Uber)</b></td>
+        <td><span class="cat transporte">Transporte</span></td>
+        <td class="preco">CLP ~20.000</td>
+        <td class="loc">≈ R$ 111</td>
+        <td class="loc">SCL → Lastarria/Providencia</td>
+        <td class="obs">~1h do aeroporto; bus Centropuerto é bem mais barato.</td>
+      </tr>
+
+      <tr class="p-transporte">
+        <td><b>Metrô de Santiago (cartão Bip!)</b></td>
+        <td><span class="cat transporte">Transporte</span></td>
+        <td class="preco">CLP ~800/viagem</td>
+        <td class="loc">≈ R$ 4,5</td>
+        <td class="loc">Rede toda a cidade</td>
+        <td class="obs">Cartão ~CLP 1.550 + carga ~CLP 10.000 no início. Desconto dom/feriados.</td>
+      </tr>
+
+      <tr class="p-transporte">
+        <td><b>Metro de Valparaíso</b></td>
+        <td><span class="cat transporte">Transporte</span></td>
+        <td class="preco">CLP ~700</td>
+        <td class="loc">≈ R$ 4</td>
+        <td class="loc">Viña ↔ Valpo</td>
+        <td class="obs">Liga as duas cidades; alternativo ao bus.</td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <div id="selBar" class="selbar hide">
+    <span>✅ <b id="selCount">0</b> selecionado(s)</span>
+    <span class="selbar-total">≈ R$ <b id="selTotal">0</b></span>
+    <span class="selbar-actions">
+      <button id="btnLimpar" class="ghost">Limpar</button>
+      <button id="btnRolar">Ver minha lista ↓</button>
+    </span>
+  </div>
+
+  <section id="minhaLista" class="minha-lista hide">
+    <h2>📋 Minha lista de passeios</h2>
+    <p class="sub" id="listaSub">Selecione passeios na tabela acima para montar seu roteiro.</p>
+    <div id="listaItens"></div>
+    <div class="lista-footer">
+      <div class="lista-total">Total aproximado: <b id="listaTotalR">R$ 0</b></div>
+      <div class="lista-actions">
+        <button id="btnCopiar" class="ghost">📋 Copiar como texto</button>
+        <button id="btnLimpar2" class="ghost">🗑️ Limpar</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <b>Notas gerais:</b><br>
+    · Câmbio de referência (jul/2026): <b>R$ 1 ≈ CLP 180</b> — valores em R$ são aproximações para dar noção.<br>
+    · Orçamento do roteiro de 5 dias (por pessoa): voo R$ 1.500–2.500 · hospedagem 4 noites R$ 1.000–1.600 · alimentação R$ 1.000–1.500 · passeios/entradas R$ 600–900 · transporte interno R$ 350–500 → <b>total ≈ R$ 5.400–7.400</b>.<br>
+    · Portillo é extra (opcional): Mini Week 3 noites a partir de US$ 793/pessoa + transfer US$ 130/trecho.<br>
+    · Gorjeta ~10% em restaurantes · água da torneira é tratada (compre no supermercado) · tomada tipo C/L 220V.<br>
+    · Fonte: notas do vault "Chile em setembro 2026" · Atualizado em 17/08/2026.
+  </footer>
+</div>
+
+<script>
+  const busca = document.getElementById('busca');
+  const botoes = document.querySelectorAll('.toggles button');
+  const linhas = Array.from(document.querySelectorAll('#tabela tbody tr'));
+  const filtros = { gratis: true, pago: true, pacote: true, transporte: true };
+
+  const STORAGE_KEY = 'chile_listao_selecao_v1';
+
+  const selTodos = document.getElementById('selTodos');
+  const selBar = document.getElementById('selBar');
+  const selCount = document.getElementById('selCount');
+  const selTotal = document.getElementById('selTotal');
+  const minhaLista = document.getElementById('minhaLista');
+  const listaItens = document.getElementById('listaItens');
+  const listaTotalR = document.getElementById('listaTotalR');
+  const listaSub = document.getElementById('listaSub');
+
+  function extrairDados(tr) {
+    const tds = tr.querySelectorAll('td');
+    const nome = tds[1].textContent.trim();
+    const tipo = tds[2].textContent.trim();
+    const preco = tds[3].textContent.trim();
+    const aprox = tds[4].textContent.trim();
+    const loc = tds[5].textContent.trim();
+    const obs = tds[6].textContent.trim();
+    return { nome, tipo, preco, aprox, loc, obs };
+  }
+
+  function valorReais(aprox) {
+    const m = aprox.match(/(\d[\d\.]*)/);
+    if (!m) return 0;
+    return parseFloat(m[1].replace(/\./g, ''));
+  }
+
+  function salvar() {
+    const nomes = linhas
+      .filter(tr => !tr.classList.contains('secao') && tr.querySelector('input[type="checkbox"]')?.checked)
+      .map(tr => extrairDados(tr).nome);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(nomes)); } catch (e) {}
+  }
+
+  function carregar() {
+    try {
+      const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      if (!Array.isArray(salvo)) return [];
+      const nomesValidos = new Set(
+        linhas.filter(tr => !tr.classList.contains('secao')).map(tr => extrairDados(tr).nome)
+      );
+      return salvo.filter(nome => nomesValidos.has(nome));
+    } catch (e) { return []; }
+  }
+
+  function atualizar() {
+    const sel = linhas.filter(tr => tr.querySelector('input[type="checkbox"]')?.checked);
+    const n = sel.length;
+    selCount.textContent = n;
+    const total = sel.reduce((s, tr) => s + valorReais(extrairDados(tr).aprox), 0);
+    selTotal.textContent = total.toLocaleString('pt-BR');
+    selBar.classList.toggle('hide', n === 0);
+    minhaLista.classList.toggle('hide', n === 0);
+
+    if (n === 0) {
+      listaItens.innerHTML = '';
+      listaTotalR.textContent = '0';
+      return;
+    }
+
+    listaItens.innerHTML = sel.map((tr, i) => {
+      const d = extrairDados(tr);
+      const r = valorReais(d.aprox);
+      return `
+        <div class="item-lista">
+          <div>
+            <div class="il-nome">${d.nome}</div>
+            <div class="il-extra">${d.loc} · ${d.obs}</div>
+          </div>
+          <div class="il-extra" style="text-align:right">${d.preco}</div>
+          <div class="il-preco">${r ? '≈ R$ ' + r.toLocaleString('pt-BR') : 'R$ 0'}</div>
+          <button class="il-del" data-idx="${i}" title="Remover">✕</button>
+        </div>`;
+    }).join('');
+    listaTotalR.textContent = total.toLocaleString('pt-BR');
+    salvar();
+  }
+
+  linhas.forEach(tr => {
+    if (tr.classList.contains('secao')) return;
+    const td = document.createElement('td');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.addEventListener('change', () => {
+      tr.classList.toggle('selecionada', cb.checked);
+      atualizar();
+    });
+    td.style.textAlign = 'center';
+    td.style.verticalAlign = 'middle';
+    td.appendChild(cb);
+    tr.insertBefore(td, tr.firstChild);
+  });
+
+  const salvo = carregar();
+  const salvoSet = new Set(salvo);
+  linhas.forEach(tr => {
+    if (tr.classList.contains('secao')) return;
+    const cb = tr.querySelector('input[type="checkbox"]');
+    if (cb && salvoSet.has(extrairDados(tr).nome)) {
+      cb.checked = true;
+      tr.classList.add('selecionada');
+    }
+  });
+
+  selTodos.addEventListener('change', () => {
+    const visiveis = linhas.filter(tr =>
+      !tr.classList.contains('secao') && !tr.classList.contains('hide'));
+    visiveis.forEach(tr => {
+      tr.querySelector('input[type="checkbox"]').checked = selTodos.checked;
+      tr.classList.toggle('selecionada', selTodos.checked);
+    });
+    atualizar();
+  });
+
+  listaItens.addEventListener('click', e => {
+    if (!e.target.classList.contains('il-del')) return;
+    const idx = parseInt(e.target.dataset.idx, 10);
+    const sel = linhas.filter(tr =>
+      !tr.classList.contains('secao') && tr.querySelector('input[type="checkbox"]')?.checked);
+    const tr = sel[idx];
+    if (tr) {
+      tr.querySelector('input[type="checkbox"]').checked = false;
+      tr.classList.remove('selecionada');
+      atualizar();
+    }
+  });
+
+  function limpar() {
+    linhas.forEach(tr => {
+      const cb = tr.querySelector('input[type="checkbox"]');
+      if (cb) { cb.checked = false; tr.classList.remove('selecionada'); }
+    });
+    selTodos.checked = false;
+    atualizar();
+  }
+  document.getElementById('btnLimpar').addEventListener('click', limpar);
+  document.getElementById('btnLimpar2').addEventListener('click', limpar);
+  document.getElementById('btnRolar').addEventListener('click', () => {
+    minhaLista.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  document.getElementById('btnCopiar').addEventListener('click', () => {
+    const sel = linhas.filter(tr =>
+      !tr.classList.contains('secao') && tr.querySelector('input[type="checkbox"]')?.checked);
+    const linhasTxt = sel.map(tr => {
+      const d = extrairDados(tr);
+      const r = valorReais(d.aprox);
+      return `- ${d.nome} — ${d.preco}${r ? ' (≈ R$ ' + r.toLocaleString('pt-BR') + ')' : ''} — ${d.loc}. ${d.obs}`;
+    }).join('\n');
+    navigator.clipboard.writeText(linhasTxt).then(() => {
+      const b = document.getElementById('btnCopiar');
+      b.textContent = '✅ Copiado!';
+      setTimeout(() => { b.textContent = '📋 Copiar como texto'; }, 1500);
+    });
+  });
+
+  function aplicar() {
+    const q = busca.value.trim().toLowerCase();
+    linhas.forEach(tr => {
+      if (tr.classList.contains('secao')) return;
+      const cats = tr.classList;
+      const tipoOk = ['gratis','pago','pacote','transporte'].some(c => cats.contains('p-' + c) && filtros[c]);
+      const txt = tr.textContent.toLowerCase();
+      const buscaOk = !q || txt.includes(q);
+      tr.classList.toggle('hide', !(tipoOk && buscaOk));
+    });
+    selTodos.checked = false;
+    selTodos.indeterminate = false;
+  }
+
+  busca.addEventListener('input', aplicar);
+
+  botoes.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.f;
+      filtros[f] = !filtros[f];
+      btn.classList.toggle('active', filtros[f]);
+      aplicar();
+    });
+  });
+
+  aplicar();
+  atualizar();
+</script>
+</body>
+</html>
